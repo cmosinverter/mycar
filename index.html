@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MyCar - A car expense tracker to manage fuel and maintenance costs">
+    <meta name="version" content="1.0.0">
+    <meta name="environment" content="production">
+    <title>MyCar Expense Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-car"></i>
+                <h1>MyCar</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</li>
+                    <li data-page="fuel"><i class="fas fa-gas-pump"></i> Fuel</li>
+                    <li data-page="maintenance"><i class="fas fa-wrench"></i> Maintenance</li>
+                    <li data-page="analytics"><i class="fas fa-chart-line"></i> Analytics</li>
+                    <li data-page="reminders"><i class="fas fa-bell"></i> Reminders</li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <main>
+            <header>
+                <div class="search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <div class="user-actions">
+                    <button id="settings-btn" class="icon-btn" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <div class="user">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+            </header>
+            
+            <div id="dashboard" class="page active">
+                <h2>Dashboard</h2>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon fuel"><i class="fas fa-gas-pump"></i></div>
+                        <div class="stat-info">
+                            <h3>Fuel Spending</h3>
+                            <p class="total-fuel-cost">$0.00</p>
+                            <p class="timeframe">This month</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon maintenance"><i class="fas fa-wrench"></i></div>
+                        <div class="stat-info">
+                            <h3>Maintenance</h3>
+                            <p class="total-maintenance-cost">$0.00</p>
+                            <p class="timeframe">This month</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon efficiency"><i class="fas fa-leaf"></i></div>
+                        <div class="stat-info">
+                            <h3>Avg. MPG</h3>
+                            <p class="avg-mpg">0.0</p>
+                            <p class="timeframe">Last 3 fills</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recent-expenses">
+                    <h3>Recent Expenses</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-expenses-table">
+                            <!-- This will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="graph-container">
+                    <h3>Monthly Expenses</h3>
+                    <div class="chart-container">
+                        <canvas id="expensesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="fuel" class="page">
+                <h2>Fuel Log</h2>
+                <div class="add-entry">
+                    <button id="add-fuel-btn" class="btn-primary"><i class="fas fa-plus"></i> Add Fuel Entry</button>
+                </div>
+                <div class="entries-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Odometer</th>
+                                <th>Gallons</th>
+                                <th>Price/Gal</th>
+                                <th>Total</th>
+                                <th>MPG</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fuel-entries">
+                            <!-- This will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Fuel Entry Modal -->
+                <div id="fuel-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>Add Fuel Entry</h3>
+                        <form id="fuel-form">
+                            <div class="form-group">
+                                <label for="fuel-date">Date</label>
+                                <input type="date" id="fuel-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="odometer">Odometer (miles)</label>
+                                <input type="number" id="odometer" min="0" step="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gallons">Gallons</label>
+                                <input type="number" id="gallons" min="0" step="0.001" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="price-per-gallon">Price per Gallon</label>
+                                <input type="number" id="price-per-gallon" min="0" step="0.001" required>
+                            </div>
+                            <button type="submit" class="btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="maintenance" class="page">
+                <h2>Maintenance Log</h2>
+                <div class="add-entry">
+                    <button id="add-maintenance-btn" class="btn-primary"><i class="fas fa-plus"></i> Add Maintenance Entry</button>
+                </div>
+                <div class="entries-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Odometer</th>
+                                <th>Service</th>
+                                <th>Cost</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenance-entries">
+                            <!-- This will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Maintenance Entry Modal -->
+                <div id="maintenance-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>Add Maintenance Entry</h3>
+                        <form id="maintenance-form">
+                            <div class="form-group">
+                                <label for="maintenance-date">Date</label>
+                                <input type="date" id="maintenance-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="maintenance-odometer">Odometer (miles)</label>
+                                <input type="number" id="maintenance-odometer" min="0" step="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="service">Service</label>
+                                <input type="text" id="service" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cost">Cost</label>
+                                <input type="number" id="cost" min="0" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="notes">Notes</label>
+                                <textarea id="notes"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="analytics" class="page">
+                <h2>Analytics</h2>
+                <div class="analytics-filters">
+                    <div class="filter">
+                        <label for="timeframe">Timeframe</label>
+                        <select id="timeframe">
+                            <option value="3months">Last 3 months</option>
+                            <option value="6months">Last 6 months</option>
+                            <option value="1year">Last year</option>
+                            <option value="all">All time</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Fuel Efficiency Trend</h3>
+                        <div class="chart-container">
+                            <canvas id="mpgChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Expenses Breakdown</h3>
+                        <div class="chart-container">
+                            <canvas id="expensesBreakdownChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Monthly Cost Comparison</h3>
+                        <div class="chart-container">
+                            <canvas id="monthlyComparisonChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Maintenance by Category</h3>
+                        <div class="chart-container">
+                            <canvas id="maintenanceCategoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="reminders" class="page">
+                <h2>Reminders</h2>
+                <div class="add-entry">
+                    <button id="add-reminder-btn" class="btn-primary"><i class="fas fa-plus"></i> Add Reminder</button>
+                </div>
+                <div class="reminders-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Due Date/Mileage</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reminders-entries">
+                            <!-- This will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Reminder Modal -->
+                <div id="reminder-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>Add Reminder</h3>
+                        <form id="reminder-form">
+                            <div class="form-group">
+                                <label for="service-type">Service Type</label>
+                                <input type="text" id="service-type" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reminder-type">Reminder Type</label>
+                                <select id="reminder-type">
+                                    <option value="date">By Date</option>
+                                    <option value="mileage">By Mileage</option>
+                                    <option value="both">Both</option>
+                                </select>
+                            </div>
+                            <div class="form-group date-group">
+                                <label for="due-date">Due Date</label>
+                                <input type="date" id="due-date">
+                            </div>
+                            <div class="form-group mileage-group">
+                                <label for="due-mileage">Due Mileage</label>
+                                <input type="number" id="due-mileage" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="reminder-notes">Notes</label>
+                                <textarea id="reminder-notes"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Settings</h3>
+            <form id="settings-form">
+                <div class="form-group">
+                    <label for="distance-unit">Distance Unit</label>
+                    <select id="distance-unit" required>
+                        <option value="miles">Miles</option>
+                        <option value="kilometers">Kilometers</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="volume-unit">Volume Unit</label>
+                    <select id="volume-unit" required>
+                        <option value="gallons">Gallons</option>
+                        <option value="liters">Liters</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Save Settings</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/fuel.js"></script>
+    <script src="js/maintenance.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/reminders.js"></script>
+    <script src="js/nav-helper.js"></script>ript src="js/nav-helper.js"></script>
+    <script src="js/test-data.js"></script> <!-- Optional: Remove this in production -->
+</body></html>
+
+
+</html>
