@@ -259,9 +259,11 @@
             
             <!-- Reminders Page -->
             <div id="reminders" class="page">
-                <h2>Reminders</h2>
+                <h2>Maintenance Reminders</h2>
                 <div class="add-entry">
-                    <button id="add-reminder-btn" class="btn-primary"><i class="fas fa-plus"></i> Add Reminder</button>
+                    <button id="add-reminder-btn" class="btn-primary">
+                        <i class="fas fa-plus"></i> Add Reminder
+                    </button>
                 </div>
                 <div class="reminders-list">
                     <table>
@@ -287,14 +289,14 @@
                         <form id="reminder-form">
                             <div class="form-group">
                                 <label for="service-type">Service Type</label>
-                                <input type="text" id="service-type" required>
+                                <input type="text" id="service-type" placeholder="e.g., Oil Change, Tire Rotation, Inspection" required>
                             </div>
                             <div class="form-group">
                                 <label for="reminder-type">Reminder Type</label>
                                 <select id="reminder-type">
                                     <option value="date">By Date</option>
                                     <option value="mileage">By Mileage</option>
-                                    <option value="both">Both</option>
+                                    <option value="both">Both Date and Mileage</option>
                                 </select>
                             </div>
                             <div class="form-group date-group">
@@ -303,13 +305,16 @@
                             </div>
                             <div class="form-group mileage-group">
                                 <label for="due-mileage">Due Mileage</label>
-                                <input type="number" id="due-mileage" min="0">
+                                <div class="input-with-unit">
+                                    <input type="number" id="due-mileage" min="0">
+                                    <span class="unit-label" id="mileage-unit-label">miles</span>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="reminder-notes">Notes</label>
-                                <textarea id="reminder-notes"></textarea>
+                                <textarea id="reminder-notes" placeholder="Additional details about this maintenance task"></textarea>
                             </div>
-                            <button type="submit" class="btn-primary">Save</button>
+                            <button type="submit" class="btn-primary">Save Reminder</button>
                         </form>
                     </div>
                 </div>

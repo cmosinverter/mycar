@@ -26,44 +26,53 @@ function displayReminders() {
         return (a.dueMileage || 0) - (b.dueMileage || 0);
     });
     
+    if (sortedReminders.length === 0) {
+        // Show empty state with icon
+        remindersTable.innerHTML = `
+            <tr>
+                <td colspan="4" class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>No reminders set yet. Add a reminder to track upcoming maintenance tasks.</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
     sortedReminders.forEach(reminder => {
         const row = document.createElement('tr');
         const status = getStatus(reminder);
         
-        // Format due info
+        // Format due info with icons
         let dueInfo = '';
         if (reminder.dueDate && reminder.dueMileage) {
-            dueInfo = `${formatDate(reminder.dueDate)} or ${formatDistance(reminder.dueMileage, 0)}`;
+            dueInfo = `<i class="far fa-calendar-alt"></i> ${formatDate(reminder.dueDate)} <br>
+                       <i class="fas fa-tachometer-alt"></i> ${formatDistance(reminder.dueMileage, 0)}`;
         } else if (reminder.dueDate) {
-            dueInfo = formatDate(reminder.dueDate);
+            dueInfo = `<i class="far fa-calendar-alt"></i> ${formatDate(reminder.dueDate)}`;
         } else if (reminder.dueMileage) {
-            dueInfo = formatDistance(reminder.dueMileage, 0);
+            dueInfo = `<i class="fas fa-tachometer-alt"></i> ${formatDistance(reminder.dueMileage, 0)}`;
         }
         
         row.innerHTML = `
             <td>${reminder.service}</td>
             <td>${dueInfo}</td>
-            <td class="status ${status.toLowerCase()}">${status}</td>
+            <td><span class="status ${status.toLowerCase()}">${status}</span></td>
             <td>
-                <button class="action-btn complete-btn" data-id="${reminder.id}" title="Mark as Completed"><i class="fas fa-check-circle"></i></button>
-                <button class="action-btn edit-btn" data-id="${reminder.id}" title="Edit"><i class="fas fa-edit"></i></button>
-                <button class="action-btn delete-btn" data-id="${reminder.id}" title="Delete"><i class="fas fa-trash"></i></button>
+                <button class="action-btn complete-btn" data-id="${reminder.id}" title="Mark as ${reminder.completed ? 'Incomplete' : 'Completed'}">
+                    <i class="fas ${reminder.completed ? 'fa-undo' : 'fa-check'}"></i>
+                </button>
+                <button class="action-btn edit-btn" data-id="${reminder.id}" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" data-id="${reminder.id}" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
             </td>
         `;
         
         remindersTable.appendChild(row);
     });
-    
-    // Show a message if no reminders
-    if (sortedReminders.length === 0) {
-        const row = document.createElement('tr');
-        const cell = document.createElement('td');
-        cell.colSpan = 4;
-        cell.textContent = 'No reminders set.';
-        cell.style.textAlign = 'center';
-        row.appendChild(cell);
-        remindersTable.appendChild(row);
-    }
     
     // Add event listeners for buttons
     document.querySelectorAll('#reminders-entries .edit-btn').forEach(btn => {
@@ -163,6 +172,9 @@ function editReminder(e) {
     
     if (!reminder) return;
     
+    // Store the original completion status
+    const originalCompletionStatus = reminder.completed;
+    
     // Pre-fill the form
     document.getElementById('service-type').value = reminder.service;
     
@@ -204,7 +216,9 @@ function editReminder(e) {
         reminder.dueDate = reminderType !== 'mileage' ? document.getElementById('due-date').value : null;
         reminder.dueMileage = reminderType !== 'date' ? parseInt(document.getElementById('due-mileage').value) : null;
         reminder.notes = document.getElementById('reminder-notes').value;
-        reminder.completed = false; // Reset completed status when editing
+        
+        // Preserve the original completion status instead of resetting it
+        reminder.completed = originalCompletionStatus;
         
         // Save and update UI
         saveData();
@@ -233,7 +247,12 @@ function completeReminder(e) {
     saveData();
     displayReminders();
     
-    showNotification(`Reminder marked as ${reminder.completed ? 'completed' : 'incomplete'}`);
+    // Updated notification with emoji
+    if (reminder.completed) {
+        showNotification('✅ Reminder marked as completed', 'success');
+    } else {
+        showNotification('🔄 Reminder marked as active again', 'info');
+    }
 }
 
 // Delete a reminder
