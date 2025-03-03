@@ -1,0 +1,225 @@
+/* Theme styles for light and dark modes */
+
+/* Light theme (default) variables are already in styles.css */
+
+/* Dark theme variables */
+.dark-theme {
+    /* Core colors */
+    --primary: #5dade2;
+    --primary-dark: #3498db;
+    --secondary: #2ecc71;
+    --secondary-dark: #27ae60;
+    --tertiary: #e74c3c;
+    --dark: #1a1a2e;
+    --gray: #a0a0a0;
+    --light-gray: #333345;
+    --white: #1e1e2e;
+    
+    /* Text colors */
+    --text-primary: #eaeaea;
+    --text-secondary: #a0a0a0;
+    
+    /* Background colors */
+    --bg-main: #121212;
+    --bg-content: #1e1e2e;
+    --bg-input: #272736;
+    --bg-hover: rgba(255, 255, 255, 0.05);
+    
+    /* Border colors */
+    --border-color: #333345;
+    
+    /* Chart colors */
+    --chart-grid: rgba(255, 255, 255, 0.1);
+    --chart-text: #a0a0a0;
+}
+
+/* Element-specific styles for dark theme */
+.dark-theme body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+}
+
+/* Sidebar adjustments */
+.dark-theme .sidebar {
+    background-color: var(--dark);
+}
+
+.dark-theme .logo h1 {
+    color: var(--text-primary);
+}
+
+.dark-theme nav ul li {
+    color: var(--text-primary);
+}
+
+.dark-theme nav ul li:hover {
+    background-color: var(--bg-hover);
+}
+
+.dark-theme nav ul li.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+.dark-theme nav ul li i {
+    color: var(--text-secondary);
+}
+
+.dark-theme nav ul li.active i {
+    color: white;
+}
+
+/* Header adjustments */
+.dark-theme header {
+    background-color: var(--bg-content);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dark-theme .search {
+    background-color: var(--bg-input);
+}
+
+.dark-theme .search input {
+    color: var(--text-primary);
+}
+
+/* Cards and tables */
+.dark-theme .stat-card,
+.dark-theme .recent-expenses,
+.dark-theme .graph-container,
+.dark-theme .entries-table,
+.dark-theme .analytics-card,
+.dark-theme .analytics-filters,
+.dark-theme .reminders-list {
+    background-color: var(--bg-content);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme h2,
+.dark-theme h3,
+.dark-theme .stat-info p {
+    color: var(--text-primary);
+}
+
+.dark-theme .stat-info .timeframe {
+    color: var(--text-secondary);
+}
+
+.dark-theme th {
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dark-theme td {
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Table cells in reminders */
+.dark-theme .reminders-list td {
+    background-color: var(--bg-input);
+}
+
+.dark-theme .reminders-list tr:hover td {
+    background-color: var(--dark);
+}
+
+/* Empty states */
+.dark-theme .reminders-list .empty-state {
+    color: var(--text-secondary);
+}
+
+.dark-theme .reminders-list .empty-state i {
+    color: var(--border-color);
+}
+
+/* Form elements */
+.dark-theme .form-group input, 
+.dark-theme .form-group select, 
+.dark-theme .form-group textarea {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.dark-theme .form-group label {
+    color: var(--text-primary);
+}
+
+.dark-theme .help-text {
+    color: var(--text-secondary);
+}
+
+/* Modal adjustments */
+.dark-theme .modal-content {
+    background-color: var(--bg-content);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .close {
+    color: var(--text-secondary);
+}
+
+/* Status badges adjustments for dark mode */
+.dark-theme td.status.ok {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.dark-theme td.status.due {
+    background-color: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.dark-theme td.status.upcoming {
+    background-color: rgba(241, 196, 15, 0.15);
+    color: #f1c40f;
+    border: 1px solid rgba(241, 196, 15, 0.3);
+}
+
+.dark-theme td.status.completed {
+    background-color: rgba(149, 165, 166, 0.15);
+    color: #95a5a6;
+    border: 1px solid rgba(149, 165, 166, 0.3);
+}
+
+/* Button styles for dark theme */
+.dark-theme .btn-primary {
+    background-color: var(--primary);
+}
+
+.dark-theme .btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Action buttons in dark mode */
+.dark-theme .action-btn {
+    color: var(--primary);
+}
+
+.dark-theme .action-btn.delete-btn {
+    color: var(--tertiary);
+}
+
+/* Enhanced reminder buttons for dark theme */
+.dark-theme .reminders-list .action-btn {
+    background-color: rgba(52, 152, 219, 0.15);
+}
+
+.dark-theme .reminders-list .action-btn.delete-btn {
+    background-color: rgba(231, 76, 60, 0.15);
+}
+
+.dark-theme .reminders-list .action-btn.complete-btn {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: var(--secondary);
+}
+
+/* Fix for notification contrast in dark mode */
+.dark-theme .notification.info {
+    background-color: var(--primary-dark);
+}
+
+/* Chart adjustments - these will be handled by the Chart.js theme plugin */

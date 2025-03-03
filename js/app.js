@@ -419,7 +419,7 @@ function setupSettings() {
     const regionSelector = document.getElementById('region-selector');
     
     // Store original values when opening the modal
-    let originalRegion, originalDistanceUnit, originalVolumeUnit;
+    let originalRegion, originalDistanceUnit, originalVolumeUnit, originalTheme;
     
     // Show settings modal
     settingsBtn.addEventListener('click', () => {
@@ -430,6 +430,7 @@ function setupSettings() {
         originalRegion = appData.settings.regionCode;
         originalDistanceUnit = appData.settings.distanceUnit;
         originalVolumeUnit = appData.settings.volumeUnit;
+        originalTheme = appData.settings.theme;
         
         settingsModal.style.display = 'block';
     });
@@ -456,16 +457,23 @@ function setupSettings() {
         const newVolumeUnit = volumeUnitSelect.value;
         const newRegion = regionSelector ? regionSelector.value : appData.settings.regionCode;
         
+        // Get theme value if the element exists
+        const themeSelector = document.getElementById('theme-selector');
+        const newTheme = themeSelector ? themeSelector.value : appData.settings.theme;
+        
         // Compare with original values that were stored when opening the modal
         const regionChanged = originalRegion !== newRegion;
         const distanceUnitChanged = originalDistanceUnit !== newDistanceUnit;
         const volumeUnitChanged = originalVolumeUnit !== newVolumeUnit;
-        const settingsChanged = regionChanged || distanceUnitChanged || volumeUnitChanged;
+        const themeChanged = originalTheme !== newTheme;
+        
+        const settingsChanged = regionChanged || distanceUnitChanged || volumeUnitChanged || themeChanged;
         
         // Update settings
         appData.settings.distanceUnit = newDistanceUnit;
         appData.settings.volumeUnit = newVolumeUnit;
         appData.settings.regionCode = newRegion;
+        appData.settings.theme = newTheme;
         
         // If region changed, update currency settings too
         if (regionChanged && regionSettings[newRegion]) {
@@ -473,6 +481,11 @@ function setupSettings() {
             appData.settings.currencySymbol = regionSettings[newRegion].currencySymbol;
             appData.settings.dateFormat = regionSettings[newRegion].dateFormat;
             appData.settings.locale = regionSettings[newRegion].locale;
+        }
+        
+        // Apply theme if it changed
+        if (themeChanged) {
+            applyTheme(newTheme);
         }
         
         // Save to localStorage
@@ -511,6 +524,9 @@ function setupSettings() {
                 }
                 if (volumeUnitChanged) {
                     changes.push(`volume unit to ${newVolumeUnit}`);
+                }
+                if (themeChanged) {
+                    changes.push(`theme to ${newTheme}`);
                 }
                 
                 changeMessage += changes.join(', ');
