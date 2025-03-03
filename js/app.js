@@ -220,13 +220,13 @@ function showNotification(message, type = 'success') {
         notification.classList.add('show');
     }, 10);
     
-    // Remove after 3 seconds
+    // Remove after 4 seconds (extended from 3)
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => {
             notification.remove();
         }, 300); // Wait for fade-out animation
-    }, 3000);
+    }, 4000);
 }
 
 // General utility functions
@@ -418,35 +418,71 @@ function setupSettings() {
     const volumeUnitSelect = document.getElementById('volume-unit');
     const regionSelector = document.getElementById('region-selector');
     
+    // Store original values when opening the modal
+    let originalRegion, originalDistanceUnit, originalVolumeUnit;
+    
     // Show settings modal
     settingsBtn.addEventListener('click', () => {
-        distanceUnitSelect.value = appData.settings.distanceUnit;
-        volumeUnitSelect.value = appData.settings.volumeUnit;
-        if (regionSelector) {
-            regionSelector.value = appData.settings.regionCode || 'us';
-        }
+        // Update form to match current settings
+        updateSettingsForm();
+        
+        // Store original values for comparison later
+        originalRegion = appData.settings.regionCode;
+        originalDistanceUnit = appData.settings.distanceUnit;
+        originalVolumeUnit = appData.settings.volumeUnit;
+        
         settingsModal.style.display = 'block';
     });
+    
+    // Region selector change - dynamically update units based on region selection
+    if (regionSelector) {
+        regionSelector.addEventListener('change', (e) => {
+            const selectedRegion = e.target.value;
+            const regionConfig = regionSettings[selectedRegion];
+            
+            if (regionConfig) {
+                // Update unit selectors to match the region defaults
+                distanceUnitSelect.value = regionConfig.distanceUnit;
+                volumeUnitSelect.value = regionConfig.volumeUnit;
+            }
+        });
+    }
     
     // Save settings
     settingsForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        const oldDistanceUnit = appData.settings.distanceUnit;
         const newDistanceUnit = distanceUnitSelect.value;
-        
-        const oldVolumeUnit = appData.settings.volumeUnit;
         const newVolumeUnit = volumeUnitSelect.value;
+        const newRegion = regionSelector ? regionSelector.value : appData.settings.regionCode;
+        
+        // Compare with original values that were stored when opening the modal
+        const regionChanged = originalRegion !== newRegion;
+        const distanceUnitChanged = originalDistanceUnit !== newDistanceUnit;
+        const volumeUnitChanged = originalVolumeUnit !== newVolumeUnit;
+        const settingsChanged = regionChanged || distanceUnitChanged || volumeUnitChanged;
         
         // Update settings
         appData.settings.distanceUnit = newDistanceUnit;
         appData.settings.volumeUnit = newVolumeUnit;
+        appData.settings.regionCode = newRegion;
+        
+        // If region changed, update currency settings too
+        if (regionChanged && regionSettings[newRegion]) {
+            appData.settings.currency = regionSettings[newRegion].currency;
+            appData.settings.currencySymbol = regionSettings[newRegion].currencySymbol;
+            appData.settings.dateFormat = regionSettings[newRegion].dateFormat;
+            appData.settings.locale = regionSettings[newRegion].locale;
+        }
         
         // Save to localStorage
         saveData();
         
+        // Close modal
+        settingsModal.style.display = 'none';
+        
         // Update UI if settings changed
-        if (oldDistanceUnit !== newDistanceUnit || oldVolumeUnit !== newVolumeUnit) {
+        if (settingsChanged) {
             updateUnitLabels();
             updateCurrencySymbols();
             
@@ -461,11 +497,30 @@ function setupSettings() {
             } else if (appData.currentPage === 'reminders') {
                 displayReminders();
             }
+            
+            // Provide detailed feedback about what changed
+            setTimeout(() => {
+                let changeMessage = 'Settings updated: ';
+                const changes = [];
+                
+                if (regionChanged) {
+                    changes.push(`region to ${regionSettings[newRegion].name}`);
+                }
+                if (distanceUnitChanged) {
+                    changes.push(`distance unit to ${newDistanceUnit}`);
+                }
+                if (volumeUnitChanged) {
+                    changes.push(`volume unit to ${newVolumeUnit}`);
+                }
+                
+                changeMessage += changes.join(', ');
+                showNotification(changeMessage, 'success');
+            }, 300);
+        } else {
+            setTimeout(() => {
+                showNotification('No changes made to settings.', 'info');
+            }, 300);
         }
-        
-        // Close modal
-        settingsModal.style.display = 'none';
-        showNotification('Settings saved successfully');
     });
 }
 

@@ -55,9 +55,9 @@ function updateRecentExpenses() {
         if (appData.settings.volumeUnit === 'liters') {
             const liters = gallonsToLiters(entry.gallons);
             const pricePerLiter = entry.pricePerGallon / 3.78541;
-            description = `${liters.toFixed(3)} L @ $${pricePerLiter.toFixed(3)}/L`;
+            description = `${liters.toFixed(3)} L @ ${appData.settings.currencySymbol}${pricePerLiter.toFixed(3)}/L`;
         } else {
-            description = `${entry.gallons.toFixed(3)} gal @ $${entry.pricePerGallon.toFixed(3)}/gal`;
+            description = `${entry.gallons.toFixed(3)} gal @ ${appData.settings.currencySymbol}${entry.pricePerGallon.toFixed(3)}/gal`;
         }
         
         allExpenses.push({

@@ -80,14 +80,37 @@ function updateMpgChart(fuelEntries) {
             });
         }
     }
+
+    // Get appropriate label for efficiency based on current units
+    let efficiencyLabel;
+    if (appData.settings.distanceUnit === 'kilometers' && appData.settings.volumeUnit === 'liters') {
+        efficiencyLabel = 'km/L';
+    } else if (appData.settings.distanceUnit === 'kilometers') {
+        efficiencyLabel = 'km/gal';
+    } else if (appData.settings.volumeUnit === 'liters') {
+        efficiencyLabel = 'mi/L';
+    } else {
+        efficiencyLabel = 'MPG';
+    }
     
     window.mpgChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: mpgData.map(item => formatDate(item.date)),
             datasets: [{
-                label: 'MPG',
-                data: mpgData.map(item => item.mpg.toFixed(1)),
+                label: efficiencyLabel,
+                data: mpgData.map(item => {
+                    // Format efficiency value based on current units
+                    let efficiencyValue = item.mpg;
+                    if (appData.settings.distanceUnit === 'kilometers' && appData.settings.volumeUnit === 'liters') {
+                        efficiencyValue = mpgToKpl(efficiencyValue);
+                    } else if (appData.settings.distanceUnit === 'kilometers') {
+                        efficiencyValue = item.mpg * 1.60934; // Convert to km/gal
+                    } else if (appData.settings.volumeUnit === 'liters') {
+                        efficiencyValue = item.mpg / 3.78541; // Convert to mi/L
+                    }
+                    return efficiencyValue.toFixed(1);
+                }),
                 borderColor: 'rgba(46, 204, 113, 1)',
                 backgroundColor: 'rgba(46, 204, 113, 0.2)',
                 borderWidth: 2,
@@ -112,7 +135,7 @@ function updateMpgChart(fuelEntries) {
                     beginAtZero: false,
                     title: {
                         display: true,
-                        text: 'Miles per Gallon'
+                        text: `Fuel Efficiency (${efficiencyLabel})`
                     }
                 },
                 x: {

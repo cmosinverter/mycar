@@ -453,16 +453,42 @@ th {
     position: fixed;
     top: 20px;
     right: 20px;
-    padding: 12px 20px;
-    border-radius: 5px;
+    padding: 15px 20px;
+    border-radius: 8px;
     color: white;
     font-weight: 500;
     z-index: 1000;
     opacity: 0;
     transform: translateY(-20px);
     transition: opacity 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-    max-width: 300px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    max-width: 350px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.notification::before {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.notification.success::before {
+    content: '\f058'; /* check-circle */
+}
+
+.notification.error::before {
+    content: '\f057'; /* times-circle */
+}
+
+.notification.warning::before {
+    content: '\f071'; /* exclamation-triangle */
+}
+
+.notification.info::before {
+    content: '\f05a'; /* info-circle */
 }
 
 .notification.show {
@@ -480,6 +506,10 @@ th {
 
 .notification.warning {
     background-color: #f39c12;
+}
+
+.notification.info {
+    background-color: var(--primary);
 }
 
 /* Responsive styles */

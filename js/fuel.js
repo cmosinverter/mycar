@@ -72,9 +72,46 @@ function updateUnitLabels() {
         headerRow.textContent = `Odometer (${appData.settings.distanceUnit})`;
     }
     
+    // Update volume unit header (Gallons/Liters)
+    const volumeHeader = document.querySelector('#fuel th:nth-child(3)');
+    if (volumeHeader) {
+        volumeHeader.textContent = appData.settings.volumeUnit === 'liters' ? 'Liters' : 'Gallons';
+    }
+    
+    // Update price per unit header
+    const priceHeader = document.querySelector('#fuel th:nth-child(4)');
+    if (priceHeader) {
+        priceHeader.textContent = appData.settings.volumeUnit === 'liters' ? 'Price/L' : 'Price/Gal';
+    }
+    
+    // Update efficiency header
     const efficiencyHeader = document.querySelector('#fuel th:nth-child(6)');
     if (efficiencyHeader) {
-        efficiencyHeader.textContent = appData.settings.distanceUnit === 'kilometers' ? 'KM/L' : 'MPG';
+        if (appData.settings.distanceUnit === 'kilometers' && appData.settings.volumeUnit === 'liters') {
+            efficiencyHeader.textContent = 'km/L';
+        } else if (appData.settings.distanceUnit === 'kilometers') {
+            efficiencyHeader.textContent = 'km/gal';
+        } else if (appData.settings.volumeUnit === 'liters') {
+            efficiencyHeader.textContent = 'mi/L';
+        } else {
+            efficiencyHeader.textContent = 'MPG';
+        }
+    }
+    
+    // Update form input labels
+    const gallonsLabel = document.querySelector('label[for="gallons"]');
+    if (gallonsLabel) {
+        gallonsLabel.textContent = appData.settings.volumeUnit === 'liters' ? 'Liters' : 'Gallons';
+    }
+    
+    const priceLabel = document.querySelector('label[for="price-per-gallon"]');
+    if (priceLabel) {
+        const currencySymbol = appData.settings.currencySymbol || '$';
+        if (appData.settings.volumeUnit === 'liters') {
+            priceLabel.textContent = `Price per Liter (${currencySymbol})`;
+        } else {
+            priceLabel.textContent = `Price per Gallon (${currencySymbol})`;
+        }
     }
 }
 
@@ -281,4 +318,12 @@ document.addEventListener('DOMContentLoaded', () => {
 function isPageVisible(pageId) {
     const page = document.getElementById(pageId);
     return page && page.classList.contains('active');
+}
+
+// Update the formatVolume function used in the display
+function formatVolume(gallons, precision = 3) {
+    if (appData.settings.volumeUnit === 'liters') {
+        return `${gallonsToLiters(gallons).toFixed(precision)} L`;
+    }
+    return `${gallons.toFixed(precision)} gal`;
 }

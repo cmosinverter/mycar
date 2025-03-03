@@ -58,7 +58,8 @@ function applyRegionSettings(regionCode) {
     
     // Update UI with new settings
     updateUnitLabels();
-    updateRegionSelector();
+    updateCurrencySymbols();
+    updateSettingsForm(); // Update the settings form dropdowns
     
     // Update content if page is already loaded
     if (appData.currentPage === 'dashboard') {
@@ -72,13 +73,32 @@ function applyRegionSettings(regionCode) {
     } else if (appData.currentPage === 'reminders') {
         displayReminders();
     }
+    
+    // Show a notification about region change that mentions unit changes
+    setTimeout(() => {
+        const unitMessage = settings.volumeUnit === 'liters' ? 
+            'Units changed to kilometers and liters' : 
+            'Units changed to miles and gallons';
+        showNotification(`Region updated to ${settings.name}. ${unitMessage}`, 'info');
+    }, 300);
 }
 
-// Update the region selector in settings
-function updateRegionSelector() {
+// Update the settings form to match current settings
+function updateSettingsForm() {
     const regionSelector = document.getElementById('region-selector');
+    const distanceUnitSelect = document.getElementById('distance-unit');
+    const volumeUnitSelect = document.getElementById('volume-unit');
+    
     if (regionSelector) {
         regionSelector.value = appData.settings.regionCode || 'us';
+    }
+    
+    if (distanceUnitSelect) {
+        distanceUnitSelect.value = appData.settings.distanceUnit;
+    }
+    
+    if (volumeUnitSelect) {
+        volumeUnitSelect.value = appData.settings.volumeUnit;
     }
 }
 
@@ -91,7 +111,7 @@ function initializeRegionSettings() {
     } 
     // Otherwise update UI to match saved region
     else {
-        updateRegionSelector();
+        updateSettingsForm();
     }
 }
 
@@ -99,8 +119,24 @@ function initializeRegionSettings() {
 document.addEventListener('DOMContentLoaded', () => {
     const regionSelector = document.getElementById('region-selector');
     if (regionSelector) {
+        // Only apply region settings when outside of the settings modal
+        // The settings modal itself handles these changes now
+        const isInSettingsModal = (element) => {
+            let parent = element.parentElement;
+            while (parent) {
+                if (parent.id === 'settings-modal') {
+                    return true;
+                }
+                parent = parent.parentElement;
+            }
+            return false;
+        };
+        
         regionSelector.addEventListener('change', (e) => {
-            applyRegionSettings(e.target.value);
+            // Only auto-apply if this is NOT inside the settings modal
+            if (!isInSettingsModal(e.target)) {
+                applyRegionSettings(e.target.value);
+            }
         });
     }
     
