@@ -21,6 +21,20 @@ function updateExpenseStats() {
         if (efficiencyDisplay) {
             efficiencyDisplay.textContent = formatEfficiency(avgMpg);
         }
+        
+        // Update the efficiency label based on units
+        const efficiencyLabel = document.querySelector('.stat-card .efficiency + .stat-info h3');
+        if (efficiencyLabel) {
+            if (appData.settings.distanceUnit === 'kilometers' && appData.settings.volumeUnit === 'liters') {
+                efficiencyLabel.textContent = 'Avg. km/L';
+            } else if (appData.settings.distanceUnit === 'kilometers') {
+                efficiencyLabel.textContent = 'Avg. km/gal';
+            } else if (appData.settings.volumeUnit === 'liters') {
+                efficiencyLabel.textContent = 'Avg. mi/L';
+            } else {
+                efficiencyLabel.textContent = 'Avg. MPG';
+            }
+        }
     } catch (error) {
         console.error("Error updating expense stats:", error);
     }

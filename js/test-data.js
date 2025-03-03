@@ -6,9 +6,9 @@ function generateTestData() {
         return; // Don't override existing data
     }
 
-    // Generate some sample fuel entries
+    // Generate some sample fuel entries - stored in miles/gallons internally
     const today = new Date();
-    let lastOdometer = 30000; // Starting odometer value
+    let lastOdometer = 30000; // Starting odometer value in miles
 
     // Create fuel entries for the past 6 months
     for (let i = 0; i < 12; i++) {
@@ -34,6 +34,9 @@ function generateTestData() {
             total: parseFloat((gallons * pricePerGallon).toFixed(2))
         });
     }
+
+    // Sort entries by date to make sure they're in order
+    appData.fuelEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     // Create maintenance entries
     const maintenanceItems = [
@@ -83,6 +86,12 @@ function generateTestData() {
     // Save all the test data
     saveData();
     console.log("Test data generated successfully");
+    
+    // Return message with test data summary
+    return {
+        status: 'success',
+        message: `Generated ${appData.fuelEntries.length} fuel entries, ${appData.maintenanceEntries.length} maintenance entries, and ${appData.reminders.length} reminders`
+    };
 }
 
 // Add a button to the app to generate test data (only during development)

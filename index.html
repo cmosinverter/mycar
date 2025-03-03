@@ -45,6 +45,7 @@
                 </div>
             </header>
             
+            <!-- Dashboard Page -->
             <div id="dashboard" class="page active">
                 <h2>Dashboard</h2>
                 <div class="dashboard-stats">
@@ -101,6 +102,7 @@
                 </div>
             </div>
             
+            <!-- Fuel Page -->
             <div id="fuel" class="page">
                 <h2>Fuel Log</h2>
                 <div class="add-entry">
@@ -153,6 +155,7 @@
                 </div>
             </div>
             
+            <!-- Maintenance Page -->
             <div id="maintenance" class="page">
                 <h2>Maintenance Log</h2>
                 <div class="add-entry">
@@ -208,6 +211,7 @@
                 </div>
             </div>
             
+            <!-- Analytics Page -->
             <div id="analytics" class="page">
                 <h2>Analytics</h2>
                 <div class="analytics-filters">
@@ -253,6 +257,7 @@
                 </div>
             </div>
             
+            <!-- Reminders Page -->
             <div id="reminders" class="page">
                 <h2>Reminders</h2>
                 <div class="add-entry">
@@ -318,6 +323,14 @@
             <h3>Settings</h3>
             <form id="settings-form">
                 <div class="form-group">
+                    <label for="region-selector">Region</label>
+                    <select id="region-selector">
+                        <option value="us">United States</option>
+                        <option value="tw">Taiwan</option>
+                    </select>
+                    <p class="help-text">Changing region will update currency and default units</p>
+                </div>
+                <div class="form-group">
                     <label for="distance-unit">Distance Unit</label>
                     <select id="distance-unit" required>
                         <option value="miles">Miles</option>
@@ -337,14 +350,13 @@
     </div>
     
     <script src="js/app.js"></script>
+    <script src="js/regions.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/fuel.js"></script>
     <script src="js/maintenance.js"></script>
     <script src="js/analytics.js"></script>
     <script src="js/reminders.js"></script>
-    <script src="js/nav-helper.js"></script>ript src="js/nav-helper.js"></script>
+    <script src="js/nav-helper.js"></script>
     <script src="js/test-data.js"></script> <!-- Optional: Remove this in production -->
-</body></html>
-
-
+</body>
 </html>

@@ -361,6 +361,14 @@ th {
     resize: vertical;
 }
 
+/* Help text style */
+.help-text {
+    color: var(--gray);
+    font-size: 0.8rem;
+    margin-top: 4px;
+    font-style: italic;
+}
+
 /* Analytics styles */
 .analytics-filters {
     background-color: var(--white);

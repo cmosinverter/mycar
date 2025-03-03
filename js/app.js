@@ -8,7 +8,12 @@ const appData = {
     currentPage: 'dashboard',
     settings: {
         distanceUnit: 'miles', // Default to miles
-        volumeUnit: 'gallons'  // Default to gallons
+        volumeUnit: 'gallons',  // Default to gallons
+        currency: 'USD',  // Default currency
+        currencySymbol: '$', // Default currency symbol
+        dateFormat: 'MM/DD/YYYY', // Default date format
+        locale: 'en-US', // Default locale
+        regionCode: null // Will be auto-detected
     }
 };
 
@@ -58,9 +63,9 @@ function formatPricePerUnit(pricePerGallon, precision = 3) {
     if (appData.settings.volumeUnit === 'liters') {
         // Convert price per gallon to price per liter
         const pricePerLiter = pricePerGallon / 3.78541;
-        return `$${pricePerLiter.toFixed(precision)}/L`;
+        return `${appData.settings.currencySymbol}${pricePerLiter.toFixed(precision)}/L`;
     }
-    return `$${pricePerGallon.toFixed(precision)}/gal`;
+    return `${appData.settings.currencySymbol}${pricePerGallon.toFixed(precision)}/gal`;
 }
 
 // Format efficiency with current unit
@@ -88,7 +93,11 @@ function loadData() {
         appData.reminders = parsedData.reminders || [];
         appData.settings = parsedData.settings || { 
             distanceUnit: 'miles',
-            volumeUnit: 'gallons'
+            volumeUnit: 'gallons',
+            currency: 'USD',
+            currencySymbol: '$',
+            dateFormat: 'MM/DD/YYYY',
+            locale: 'en-US'
         };
     }
 }
@@ -156,18 +165,37 @@ function setupModals() {
     });
 }
 
-// Format currency
+// Format currency with region-specific settings
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(amount);
+    try {
+        const currencyCode = appData.settings.currency || 'USD';
+        const locale = appData.settings.locale || 'en-US';
+        
+        return new Intl.NumberFormat(locale, {
+            style: 'currency',
+            currency: currencyCode
+        }).format(amount);
+    } catch (error) {
+        // Fallback to basic formatting if Intl isn't supported
+        const symbol = appData.settings.currencySymbol || '$';
+        return `${symbol}${amount.toFixed(2)}`;
+    }
 }
 
-// Format date
+// Format date with region-specific settings
 function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    try {
+        const date = new Date(dateString);
+        const locale = appData.settings.locale || 'en-US';
+        
+        // Different date format options based on region
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        
+        return date.toLocaleDateString(locale, options);
+    } catch (error) {
+        // Fallback to ISO format if formatting fails
+        return dateString;
+    }
 }
 
 // Display a notification
@@ -225,7 +253,7 @@ function calculateAvgMPG(entries, count = 3) {
         }
     }
     
-    return validEntries > 0 ? (totalMPG / validEntries).toFixed(1) : 0;
+    return validEntries > 0 ? totalMPG / validEntries : 0;
 }
 
 // Get expenses by month for the last 6 months
@@ -363,6 +391,24 @@ function handleWindowResize() {
     });
 }
 
+// Update currency symbols across the app
+function updateCurrencySymbols() {
+    const currencySymbol = appData.settings.currencySymbol || '$';
+    
+    // Update fuel modal price label
+    const priceLabel = document.querySelector('label[for="price-per-gallon"]');
+    if (priceLabel) {
+        const unitName = appData.settings.volumeUnit === 'liters' ? 'Liter' : 'Gallon';
+        priceLabel.textContent = `Price per ${unitName} (${currencySymbol})`;
+    }
+    
+    // Update maintenance cost label
+    const costLabel = document.querySelector('label[for="cost"]');
+    if (costLabel) {
+        costLabel.textContent = `Cost (${currencySymbol})`;
+    }
+}
+
 // Setup settings handlers
 function setupSettings() {
     const settingsBtn = document.getElementById('settings-btn');
@@ -370,11 +416,15 @@ function setupSettings() {
     const settingsForm = document.getElementById('settings-form');
     const distanceUnitSelect = document.getElementById('distance-unit');
     const volumeUnitSelect = document.getElementById('volume-unit');
+    const regionSelector = document.getElementById('region-selector');
     
     // Show settings modal
     settingsBtn.addEventListener('click', () => {
         distanceUnitSelect.value = appData.settings.distanceUnit;
         volumeUnitSelect.value = appData.settings.volumeUnit;
+        if (regionSelector) {
+            regionSelector.value = appData.settings.regionCode || 'us';
+        }
         settingsModal.style.display = 'block';
     });
     
@@ -398,6 +448,8 @@ function setupSettings() {
         // Update UI if settings changed
         if (oldDistanceUnit !== newDistanceUnit || oldVolumeUnit !== newVolumeUnit) {
             updateUnitLabels();
+            updateCurrencySymbols();
+            
             if (appData.currentPage === 'dashboard') {
                 updateDashboard();
             } else if (appData.currentPage === 'fuel') {
@@ -406,6 +458,8 @@ function setupSettings() {
                 displayMaintenanceEntries();
             } else if (appData.currentPage === 'analytics') {
                 updateAnalytics();
+            } else if (appData.currentPage === 'reminders') {
+                displayReminders();
             }
         }
         
@@ -430,6 +484,13 @@ function updateUnitLabels() {
             } else {
                 efficiencyLabel.textContent = 'Avg. MPG';
             }
+        }
+        
+        // Update the efficiency value as well
+        const avgMpg = calculateAvgMPG(appData.fuelEntries);
+        const efficiencyDisplay = document.querySelector('.avg-mpg');
+        if (efficiencyDisplay) {
+            efficiencyDisplay.textContent = formatEfficiency(avgMpg);
         }
     } else if (appData.currentPage === 'fuel') {
         // Update fuel page labels
@@ -493,6 +554,9 @@ function updateUnitLabels() {
             }
         }
     }
+    
+    // Update currency symbols in forms and tables
+    updateCurrencySymbols();
 }
 
 // Initialize application
